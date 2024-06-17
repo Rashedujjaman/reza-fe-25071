@@ -1,3 +1,4 @@
+//components/Footer.tsx
 import { ArrowForwardIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
 import { FaMapMarker } from "react-icons/fa";
 import {

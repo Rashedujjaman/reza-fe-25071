@@ -1,5 +1,8 @@
 // components/Home.tsx
 import { useEffect, useState } from "react";
+import { MovieSkeleton } from "./MovieSkeleton";
+import { RiPlayLargeLine } from "react-icons/ri";
+import { TimeIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   Box,
   Heading,
@@ -15,9 +18,6 @@ import {
   Center,
 } from "@chakra-ui/react";
 const PLACEHOLDER_COUNT = 5;
-import { MovieSkeleton } from "../components/MovieSkeleton";
-import { RiPlayLargeLine } from "react-icons/ri";
-import { TimeIcon, ViewIcon } from "@chakra-ui/icons";
 
 interface Movie {
   Movie_ID: number;
@@ -60,7 +60,7 @@ export default function Home() {
       .then((response) => response.json())
       .then((data) => setMovies(data.data))
       .catch((error) => console.error("Error fetching movies:", error));
-  }, []);
+  }, [setMovies]);
 
   return (
     <Box color="white" fontFamily={"DM Sans"}>

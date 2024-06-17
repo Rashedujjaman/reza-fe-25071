@@ -1,8 +1,11 @@
+// pages/_app.tsx
 import { AppProps } from 'next/app';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { Provider as ReduxProvider } from 'react-redux';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { MovieProvider } from '../context/MovieContext';
+import store from '../redux/store';
 
 const theme = extendTheme({
   styles: {
@@ -16,12 +19,14 @@ const theme = extendTheme({
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <ChakraProvider theme ={theme}>
-      <MovieProvider >
-        <Navbar />
-        <Component {...pageProps} />
-        <Footer />
-      </MovieProvider>
+    <ChakraProvider theme={theme}>
+      <ReduxProvider store={store}>
+        <MovieProvider>
+          <Navbar />
+          <Component {...pageProps} />
+          <Footer />
+        </MovieProvider>
+      </ReduxProvider>
     </ChakraProvider>
   );
 }

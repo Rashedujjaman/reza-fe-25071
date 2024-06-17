@@ -1,3 +1,6 @@
+//components/Navbar.tsx
+import { FaSearch, FaUserCircle } from "react-icons/fa";
+import { useRouter } from "next/router";
 import {
   Flex,
   Link,
@@ -9,8 +12,6 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import { FaSearch, FaUserCircle } from "react-icons/fa";
-import { useRouter } from "next/router";
 
 export default function Navbar() {
   const router = useRouter();
@@ -99,21 +100,42 @@ export default function Navbar() {
               variant="ghost"
               colorScheme="black"
               color={"white"}
+              _hover={{ color: "yellow.300" }}
+              width={"fit-content"}
+              height={"fit-content"}
             />
-            <MenuList color="black">
-              <MenuItem onClick={() => router.push("/SearchByTheater")}>
+            <MenuList color="white" bg={"transparent"}>
+              <MenuItem
+                width={"fit-content"}
+                bg={"rgba(0,0,0,0)"}
+                onClick={() => router.push("/SearchByTheater")}
+              >
                 Search by Theater
               </MenuItem>
-              <MenuItem onClick={() => router.push("/SearchByTimeSlot")}>
+              <MenuItem
+                width={"fit-content"}
+                bg={"rgba(0,0,0,0)"}
+                onClick={() => router.push("/SearchByTimeSlot")}
+              >
                 Search by Time Slot
               </MenuItem>
             </MenuList>
           </Menu>
         </Link>
-        <Flex ml={4} alignItems="center">
-          <FaUserCircle size="24px" />
-          <Text ml={2}>John Glich</Text>
-        </Flex>
+
+        <Link
+          href="#"
+          _hover={{
+            textDecoration: "underline",
+            textDecorationColor: "yellow.300",
+            textDecorationThickness: "4px",
+          }}
+        >
+          <Flex ml={4} alignItems="center">
+            <FaUserCircle size="24px" />
+            <Text ml={2}>John Glich</Text>{" "}
+          </Flex>
+        </Link>
       </Flex>
     </Flex>
   );

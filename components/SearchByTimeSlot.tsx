@@ -1,8 +1,17 @@
+//components/searchByTimeSlot.tsx
 import { useState, useEffect } from "react";
-import { MovieSkeleton } from "../components/MovieSkeleton";
+import { MovieSkeleton } from "./MovieSkeleton";
 import { SearchIcon, TimeIcon, ViewIcon } from "@chakra-ui/icons";
 import { RiPlayLargeLine } from "react-icons/ri";
 const PLACEHOLDER_COUNT = 6;
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../redux/store";
+import {
+  setSearchTerm,
+  setSearchTimeStart,
+  setSearchTimeEnd,
+  setSearchResults,
+} from "../redux/searchSlice";
 import {
   Box,
   Center,
@@ -15,26 +24,11 @@ import {
   Input,
   InputLeftElement,
   InputGroup,
-  Link,
   Icon,
   CircularProgressLabel,
   CircularProgress,
   Button,
 } from "@chakra-ui/react";
-
-interface Movie {
-  Movie_ID: number;
-  Title: string;
-  Genre: string;
-  Duration: string;
-  Views: string;
-  Poster: string;
-  Overall_rating: number;
-  Description: string;
-  Start_Time: string;
-  End_Time: string;
-  Theater_room_no: string;
-}
 
 function formatDuration(duration: string): string {
   const match = duration.match(/(\d+)\s+hour(?:s)?\s+(\d+)\s+minutes?/);
@@ -54,44 +48,61 @@ function formatDuration(duration: string): string {
 }
 
 export default function SearchByTimeSlot() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [theater_name, setTheater_name] = useState("");
-  const [time_start, setTime_start] = useState("");
-  const [time_end, setTime_end] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const { searchTerm, timeStart, timeEnd, searchResults } = useSelector(
+    (state: RootState) => state.search
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchMovies = async (
-    theater_name: string,
-    time_start: string,
-    time_end: string
-  ) => {
-    const apiUrl = `https://821f21ea-3d75-4b17-bac5-f8a0fc587ad2.mock.pstmn.io/timeslot?theater_name=${theater_name}&time_start=${time_start}&time_end=${time_end}`;
+  const fetchMovies = async () => {
+    const apiUrl = `https://821f21ea-3d75-4b17-bac5-f8a0fc587ad2.mock.pstmn.io/timeslot?theater_name=${searchTerm}&time_start=${timeStart}&time_end=${timeEnd}`;
 
+    setIsLoading(true);
     try {
       const response = await fetch(apiUrl);
-      const data = await response.json();
-
-      if (data.data && data.data.length > 0) {
-        setMovies(data.data);
-      } else {
-        setMovies([]);
+      if (!response.ok) {
+        throw new Error("Network response was not ok.");
       }
+      const data = await response.json();
+      dispatch(setSearchResults(data.data || []));
     } catch (error) {
       console.error("Error fetching search results:", error);
-      setMovies([]);
+      dispatch(setSearchResults([]));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (theater_name && time_start && time_end) {
-      fetchMovies(theater_name, time_start, time_end);
+    if (searchTerm && timeStart && timeEnd) {
+      fetchMovies();
     }
-  }, [theater_name, time_start, time_end]);
+  }, [searchTerm, timeStart, timeEnd]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSearchTerm(event.target.value));
+  };
+
+  const handleTimeStartChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    dispatch(setSearchTimeStart(event.target.value));
+  };
+
+  const handleTimeEndChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSearchTimeEnd(event.target.value));
+  };
 
   const handleSearch = () => {
-    fetchMovies(theater_name, time_start, time_end);
+    dispatch(setSearchResults([]));
+    //if search term value or date value is empty, then return
+    if (!searchTerm || !timeStart || !timeEnd) {
+      return;
+    }
   };
 
   return (
+    // Full Component box
     <Box color="white" fontFamily={"DM Sans"}>
       <Center height="80vh" mx="7%">
         <Flex p={10} alignItems="center" justifyContent="center">
@@ -151,8 +162,8 @@ export default function SearchByTimeSlot() {
                   color="rgba(0, 0, 0, .45)"
                   placeholder="Search by theater..."
                   borderRadius={"25px"}
-                  value={theater_name}
-                  onChange={(e) => setTheater_name(e.target.value)}
+                  value={searchTerm}
+                  onChange={handleInputChange}
                 />
               </InputGroup>
             </Box>
@@ -166,8 +177,8 @@ export default function SearchByTimeSlot() {
                     bgColor="rgba(255, 255, 255, 1)"
                     color="rgba(0, 0, 0, .45)"
                     borderRadius={"25px"}
-                    value={time_start}
-                    onChange={(e) => setTime_start(e.target.value)}
+                    value={timeStart}
+                    onChange={handleTimeStartChange}
                   />
                 </InputGroup>
               </Box>
@@ -180,8 +191,8 @@ export default function SearchByTimeSlot() {
                     bgColor="rgba(255, 255, 255, 1)"
                     color="rgba(0, 0, 0, .45)"
                     borderRadius={"25px"}
-                    value={time_end}
-                    onChange={(e) => setTime_end(e.target.value)}
+                    value={timeEnd}
+                    onChange={handleTimeEndChange}
                   />
                 </InputGroup>
               </Box>
@@ -215,8 +226,8 @@ export default function SearchByTimeSlot() {
             templateColumns={{ base: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }}
             gap={4}
           >
-            {movies.length > 0 // Conditionally render movies or placeholders
-              ? movies.map((movie, index) => (
+            {searchResults.length > 0 // Conditionally render movies or placeholders
+              ? searchResults.map((movie, index) => (
                   <GridItem
                     key={movie.Movie_ID}
                     colSpan={1}

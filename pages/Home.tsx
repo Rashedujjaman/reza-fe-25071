@@ -142,7 +142,7 @@ export default function Home() {
                     key={movie.Movie_ID}
                     colSpan={index === 0 ? { base: 1, md: 2 } : 1}
                     overflow="hidden"
-                    bgGradient="linear(to-b, rgba(0,0,0,.8), rgba(0,0,0,1))"
+                    bgGradient="linear(to-b, rgba(0,0,0,0), rgba(0,0,0,1))"
                     color="white"
                     minHeight={{ md: "50px" }}
                     position="relative"
